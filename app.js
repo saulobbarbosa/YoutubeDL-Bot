@@ -16,7 +16,7 @@ import {
 // Setup
 const app = express();
 const exec = promisify(execCallback);
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 6060;
 const DOWNLOAD_DIR = path.join(process.cwd(), 'downloads');
 
 // Cria a pasta se não existir
@@ -48,7 +48,7 @@ app.post('/interactions', express.json(), verifyKeyMiddleware(process.env.PUBLIC
     res.send({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE });
 
     try {
-      const { stdout } = await exec(`.\\yt-dlp_win\\yt-dlp.exe --dump-json "${link}"`, { timeout: 300_000 });
+      const { stdout } = await exec(`yt-dlp --dump-json "${link}"`, { timeout: 300_000 });
       const jsonStr = stdout.trim().split('\n').pop();
       const videoData = JSON.parse(jsonStr);
 
@@ -145,7 +145,7 @@ app.post('/interactions', express.json(), verifyKeyMiddleware(process.env.PUBLIC
 
       try {
         // Obtém os dados do vídeo com yt-dlp
-        const { stdout } = await exec(`.\\yt-dlp_win\\yt-dlp.exe --dump-json "${url}"`);
+        const { stdout } = await exec(`yt-dlp --dump-json "${url}"`);
         const videoData = JSON.parse(stdout.trim().split('\n').pop());
 
         // Sanitiza o título para gerar um nome de arquivo seguro
@@ -155,7 +155,7 @@ app.post('/interactions', express.json(), verifyKeyMiddleware(process.env.PUBLIC
         const fullPath = path.join(DOWNLOAD_DIR, finalFilename);
 
         // Faz o download com o nome de arquivo sanitizado
-        await exec(`.\\yt-dlp_win\\yt-dlp.exe ${format} -o "${fullPath}" "${url}"`, { timeout: 300_000 });
+        await exec(`yt-dlp ${format} -o "${fullPath}" "${url}"`, { timeout: 300_000 });
 
         // Envia o link de download com nome seguro
         const downloadUrl = `https://wildcat-light-loosely.ngrok-free.app/downloads/${encodeURIComponent(finalFilename)}`;
