@@ -1,0 +1,17 @@
+services:
+  youtube-dl:
+    image: kushirot/youtubedl-bot:latest
+    container_name: youtubedl-bot
+    ports:
+      - "6060:6060"
+    env_file: "./.env"
+    entrypoint: >
+      sh -c "rm -rf /app/downloads/* && node ./app.js"
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    command: tunnel --no-autoupdate run --token 
+    restart: unless-stopped
+    network_mode: host
