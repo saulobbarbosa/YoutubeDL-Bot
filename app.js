@@ -158,7 +158,7 @@ app.post('/interactions', express.json(), verifyKeyMiddleware(process.env.PUBLIC
         await exec(`yt-dlp ${format} -o "${fullPath}" "${url}"`, { timeout: 300_000 });
 
         // Envia o link de download com nome seguro
-        const downloadUrl = `https://youtubedl-bot.onrender.com/downloads/${encodeURIComponent(finalFilename)}`;
+        const downloadUrl = `https://youtubedl-bot-production.up.railway.app/downloads/${encodeURIComponent(finalFilename)}`;
         await fetch(`https://discord.com/api/v10/webhooks/${appId}/${token}/messages/@original`, {
           method: 'PATCH',
           headers: {
