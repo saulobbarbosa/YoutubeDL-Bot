@@ -48,7 +48,7 @@ app.post('/interactions', express.json(), verifyKeyMiddleware(process.env.PUBLIC
     res.send({ type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE });
 
     try {
-      const { stdout } = await exec(`yt-dlp --dump-json "${link}"`, { timeout: 300_000 });
+      const { stdout } = await exec(`yt-dlp --cookies mycookies.txt --dump-json "${link}"`, { timeout: 300_000 });
       const jsonStr = stdout.trim().split('\n').pop();
       const videoData = JSON.parse(jsonStr);
 
@@ -140,12 +140,12 @@ app.post('/interactions', express.json(), verifyKeyMiddleware(process.env.PUBLIC
     (async () => {
 
       const format = choice === 'video'
-        ? '-f bestvideo+bestaudio --merge-output-format mp4'
-        : '-f bestaudio --extract-audio --audio-format mp3 --audio-quality 0';
+        ? '-f bestvideo+bestaudio --merge-output-format mp4 --cookies mycookies.txt'
+        : '-f bestaudio --extract-audio --audio-format mp3 --audio-quality 0 --cookies mycookies.txt';
 
       try {
         // Obtém os dados do vídeo com yt-dlp
-        const { stdout } = await exec(`yt-dlp --dump-json "${url}"`);
+        const { stdout } = await exec(`yt-dlp --dump-json --cookies mycookies.txt "${url}"`);
         const videoData = JSON.parse(stdout.trim().split('\n').pop());
 
         // Sanitiza o título para gerar um nome de arquivo seguro
@@ -158,7 +158,7 @@ app.post('/interactions', express.json(), verifyKeyMiddleware(process.env.PUBLIC
         await exec(`yt-dlp ${format} -o "${fullPath}" "${url}"`, { timeout: 300_000 });
 
         // Envia o link de download com nome seguro
-        const downloadUrl = `https://youtubebot.sauloserver.shop/downloads/${encodeURIComponent(finalFilename)}`;
+        const downloadUrl = `https://youtubedl-bot.onrender.com/downloads/${encodeURIComponent(finalFilename)}`;
         await fetch(`https://discord.com/api/v10/webhooks/${appId}/${token}/messages/@original`, {
           method: 'PATCH',
           headers: {
